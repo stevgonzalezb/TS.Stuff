@@ -1,6 +1,9 @@
 import Constants from "./constants";
 import Errors from "./errors";
 import Messages from "./messages";
+import Schemas from '../../../resources/Schemas/SchemasHandler';
+import Config from '../../../resources/config';
+import Logger from '../Logger';
 import Ajv from 'ajv';
 
 class Common {
@@ -12,12 +15,12 @@ class Common {
 	Logger: any;
 	Schemas: any;
 
-	constructor(Config: any, Logger: any, Schemas: any ) {
+	constructor() {
         this.Config = Config;
 		this.Constants = Constants;
 		this.Errors = Errors;
 		this.Messages = Messages;
-		this.Logger = Logger;
+		this.Logger = Logger.init(Config);
 		this.Schemas = Schemas;
     }
 

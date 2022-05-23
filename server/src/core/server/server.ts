@@ -1,6 +1,4 @@
 import path from "path";
-import Schemas from '../../resources/Schemas/SchemasHandler';
-import Config from '../../resources/config';
 import express from "express";
 
 global.appRoot = path.join(__dirname);
@@ -8,37 +6,42 @@ global.appRoot = path.join(__dirname);
 
 export default class Server {
 
-    private app: any;
-    private port: number;
+    private Common:any;
+    private WebApp: any;
+    private Port: number;
 
-    constructor() {
-        this.app = express();
-        this.port = 8080;
+    constructor(Common: any) {
+        this.Common = Common;
+        this.WebApp = express();
+        this.Port = Common.Config.WebServer.Port;
         this.Routes();
         this.Start();
     }
 
     async Routes() {
+        const self = this;
         try {
             // define a route handler for the default home page
-            this.app.get( "/", ( req:any, res:any ) => {
-                res.send( "Hello world!" );
+            this.WebApp.get( "/health", ( req:any, res:any ) => {
+                res.send( "Web server is running!" );
             });
         } catch (error) {
-            // to-do
+            self.Common.Logger.Error(`server.ts >> Routes() >> Error: ${error}`)
         }
     }
 
     async Start() {
+        const self = this;
         try {
-            // start the Express server
-            this.app.listen( this.port, () => {
-
+            // Start the Express server
+            this.WebApp.listen( this.Port, () => {
+                self.Common.Logger.Info(`Web Server Started Correctly at http://localhost:${ this.Port }`)
+                self.Common.Logger.Debug(`Web Server Started Correctly at http://localhost:${ this.Port }.`)
             // tslint:disable-next-line:no-console
-            console.log( `server started at http://localhost:${ this.port }` );
+            // console.log( `server started at http://localhost:${ this.port }` );
             });
         } catch (error) {
-            // To-do
+            self.Common.Logger.Error(`server.ts >> Start() >> Error: ${error}`)
         }
     }
 }

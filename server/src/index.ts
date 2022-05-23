@@ -3,12 +3,21 @@ import Schemas from './resources/Schemas/SchemasHandler';
 import Config from './resources/config';
 import Logger from './core/components/Logger';
 import Common from './core/components/Common';
+import path from 'path';
 
+appRoot = path.resolve(__dirname);
 
-// Create intance of common modules
-const logger = Logger.init(Config);
-const common = Common.init(Config, logger, Schemas);
+try {
+    // Create intance of common modules
+    // const oLogger = Logger.init(Config);
+    const oCommon = Common.init();
 
-// Start web sever
-Server.init();
-common.Logger.Debug("Server started succesfully")
+    // Start web sever
+    Server.init(oCommon);
+
+} catch (error) {
+
+    // tslint:disable-next-line:no-console
+    console.log(error);
+}
+

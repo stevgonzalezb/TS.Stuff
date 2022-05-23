@@ -4,7 +4,7 @@ export =
       LevelsMap: [{name: 'ERROR', level: 0}, {name: 'INFO', level: 1}, {name: 'DEBUG', level: 2}],
       Level: "DEBUG",
       FileName:{
-         Name: "servicio_gestiones-BHD",
+         Name: "JS-Tools-logs",
          DatePattern: "YYYY-MM-DD-HH"
       },
       DateFormat: "YYYY-MM-DD HH:mm:ss.SSS",
@@ -17,8 +17,8 @@ export =
          Type: "f"
       },
       Backup:{
-         RequireBackup: true,
-         BackupFolderName :"BackupLogsGestionesBHD"
+         RequireBackup: false,
+         BackupFolderName :"BackupLogs"
       },
       ZippedLogFile: false
    },

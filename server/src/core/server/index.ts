@@ -1,7 +1,7 @@
 import Server from "./server";
 
 export = {
-	init() {
-		return new Server();
+	init(Common:any) {
+		return new Server(Common);
 	}
 }
