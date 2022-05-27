@@ -1,27 +1,16 @@
-import Constants from "./constants";
-import Errors from "./errors";
-import Messages from "./messages";
-import Schemas from '../../../resources/Schemas/SchemasHandler';
 import Config from '../../../resources/config';
 import Logger from '../Logger';
 import Ajv from 'ajv';
 
-class Common {
-	Config: any;
-	Constants: any;
-	Errors: any;
-	Messages: any;
-	ErrorFactory: any;
+
+export default class Common {
+
+	Config: Config;
 	Logger: any;
-	Schemas: any;
 
 	constructor() {
         this.Config = Config;
-		this.Constants = Constants;
-		this.Errors = Errors;
-		this.Messages = Messages;
 		this.Logger = Logger.init(Config);
-		this.Schemas = Schemas;
     }
 
 	async Format(str: any, args: any) {
@@ -43,4 +32,3 @@ class Common {
 		}
 	}
 }
-export = Common;

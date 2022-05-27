@@ -4,10 +4,10 @@ import mssql from 'mssql';
 
 class Scrapper {
 
-    Common:any;
+    Common:Common;
     Sql:any;
 
-	constructor(Common:any, Sql:any) {
+	constructor(Common:Common, Sql:any) {
 		this.Common = Common;
 		this.Sql = Sql;
 	}
@@ -21,20 +21,20 @@ class Scrapper {
 			const dataInsertion = await self.InsertToDataBase(dataToInsert);
 
 			if (dataInsertion.success) {
-				return self.Common.Logger.Info(`[scraper.js].[Scrape] >> Inserción exitosa en base de datos`);
+				return self.Common.Logger.Info(`[scraper.ts].[Scrape] >> Inserción exitosa en base de datos`);
 			} else {
-				return self.Common.Logger.Error(`[scraper.js].[Scrape] >> Error durante inserción en base de datos: ${dataInsertion.error}`);
+				return self.Common.Logger.Error(`[scraper.ts].[Scrape] >> Error during database insertion: ${dataInsertion.error}`);
 			}
 
 		} catch (err) {
-			return self.Common.Logger.Error(`[scraper.js].[Scrape] >> Error realizando scraping: ${err.message}`);
+			return self.Common.Logger.Error(`[scraper.ts].[Scrape] >> Scraping error: ${err.message}`);
 		}
 	}
 
 	async StartBrowser() {
 		const self = this;
 		try {
-			self.Common.Logger.Debug(`[scraper.js].[StartBrowser] >> Abriendo el navegador......`);
+			self.Common.Logger.Debug(`[scraper.ts].[StartBrowser] >> Opening the browser......`);
 			const browser = await puppeteer.launch({
 				headless: false,
 				args: ["--disable-setuid-sandbox"],
@@ -42,8 +42,8 @@ class Scrapper {
 			});
 			return browser;
 		} catch (err) {
-			self.Common.Logger.Error(`[scraper.js].[StartBrowser] >> No se pudo crear una instancia del navegador: ${err.message}`);
-			throw new Error(`No se pudo crear una instancia del navegador: ${err.message}`);
+			self.Common.Logger.Error(`[scraper.ts].[StartBrowser] >> Failed to create a browser instance: ${err.message}`);
+			throw new Error(`Failed to create a browser instance: ${err.message}`);
 		}
 	}
 
@@ -52,7 +52,7 @@ class Scrapper {
 		try {
 			const mainUrl = self.Common.Config.CIAWebPageUrl;
 			const page = await browser.newPage();
-			self.Common.Logger.Debug(`[scraper.js].[GetCountriesUrls] >> Navegando hacia ${mainUrl}...`);
+			self.Common.Logger.Debug(`[scraper.ts].[GetCountriesUrls] >> Navigating to ${mainUrl}...`);
 			await page.goto(mainUrl);
 			await page.waitForSelector('.Resources');
 
@@ -70,11 +70,11 @@ class Scrapper {
 				if (i < numberOfPages) await self.ScrollAndClickNextpage(page);
 			}
 			await page.close();
-			self.Common.Logger.Info(`[scraper.js].[GetCountriesUrls] >> Finalzia obtención de URLs de países`);
+			self.Common.Logger.Info(`[scraper.ts].[GetCountriesUrls] >> Country URLs retrieval is complete`);
 			return fullCountriesUrls;
 		} catch (err) {
-			self.Common.Logger.Error(`[scraper.js].[GetCountriesUrls] >> Error obteniendo urls de los países de la página de la CIA: ${err.message}`);
-			throw new Error(`Error obteniendo urls de los países de la página de la CIA: ${err.message}`);
+			self.Common.Logger.Error(`[scraper.ts].[GetCountriesUrls] >> Error getting country urls from the CIA web site: ${err.message}`);
+			throw new Error(`Error getting country urls from the CIA web site: ${err.message}`);
 		}
 	}
 
@@ -86,7 +86,7 @@ class Scrapper {
 				const page = await browser.newPage();
 				const formattedUrl = countryUrl.slice(0, -1);
 				const country = formattedUrl.substring(formattedUrl.lastIndexOf('/') + 1);
-				self.Common.Logger.Debug(`[scraper.js].[GetAndFormatFinalData] >> Navegando hacia ${countryUrl}...`);
+				self.Common.Logger.Debug(`[scraper.ts].[GetAndFormatFinalData] >> Navegando hacia ${countryUrl}...`);
 				await page.goto(countryUrl);
 				await page.waitForSelector('.free-form-content__content');
 
@@ -100,10 +100,10 @@ class Scrapper {
 				await page.close();
 			});
 			await browser.close();
-			self.Common.Logger.Info(`[scraper.js].[GetAndFormatFinalData] >>Finaliza formateo de data de todos los países`);
+			self.Common.Logger.Info(`[scraper.ts].[GetAndFormatFinalData] >>Finaliza formateo de data de todos los países`);
 			return allCountriesData;
 		} catch (err) {
-			self.Common.Logger.Error(`[scraper.js].[GetAndFormatData] >> Error obteniendo y formateando data final: ${err.message}`);
+			self.Common.Logger.Error(`[scraper.ts].[GetAndFormatData] >> Error obteniendo y formateando data final: ${err.message}`);
 			throw new Error(`Error obteniendo datos de país: ${err.message}`);
 		}
 	}
@@ -111,7 +111,7 @@ class Scrapper {
 	async FormatCountryData(unstructuredData:any, country:any) {
 		const self = this;
 		try {
-			self.Common.Logger.Debug(`[scraper.js].[GetAndFormatDataByCountry] >> Obteniendo y formateando datos de país (${country})...`);
+			self.Common.Logger.Debug(`[scraper.ts].[GetAndFormatDataByCountry] >> Obteniendo y formateando datos de país (${country})...`);
 			const formattedList = [];
 			while (unstructuredData.length > 0) {
 				const currentPerson = unstructuredData.splice(0, 2);
@@ -119,7 +119,7 @@ class Scrapper {
 			}
 			return formattedList;
 		} catch (err) {
-			self.Common.Logger.Error(`[scraper.js].[GetAndFormatDataByCountry] >> Error obteniendo y formateando datos de país: ${err.message}`);
+			self.Common.Logger.Error(`[scraper.ts].[GetAndFormatDataByCountry] >> Error obteniendo y formateando datos de país: ${err.message}`);
 			throw new Error(`Error obteniendo datos de país: ${err.message}`);
 		}
 	}
@@ -127,7 +127,7 @@ class Scrapper {
 	async GetAndFormatCountriesListPage(page:any) {
 		const self = this;
 		try {
-			self.Common.Logger.Debug(`[scraper.js].[GetAndFormatCountriesListPage] >> Inicia obtención y formateo de urls de países desde paginación`);
+			self.Common.Logger.Debug(`[scraper.ts].[GetAndFormatCountriesListPage] >> Inicia obtención y formateo de urls de países desde paginación`);
 			const urls = await page.$$eval('.Resources a', async (countries:any) => {
 				countries = countries.map((country:any) => country.href);
 				countries.shift(); // Primer enlace, se elimina porque no es de un país
@@ -135,7 +135,7 @@ class Scrapper {
 			});
 			return urls;
 		} catch (err) {
-			self.Common.Logger.Error(`[scraper.js].[GetAndFormatCountriesListPage] >> Error obteniendo y formateando en paginación de países: ${err.message}`);
+			self.Common.Logger.Error(`[scraper.ts].[GetAndFormatCountriesListPage] >> Error obteniendo y formateando en paginación de países: ${err.message}`);
 			throw new Error(err.message);
 		}
 	}
@@ -143,7 +143,7 @@ class Scrapper {
 	async ScrollAndClickNextpage(page:any) {
 		const self = this;
 		try {
-			self.Common.Logger.Debug(`[scraper.js].[ScrollAndClickNextpage] >> Haciendo scroll y click en paginación de países...`);
+			self.Common.Logger.Debug(`[scraper.ts].[ScrollAndClickNextpage] >> Haciendo scroll y click en paginación de países...`);
 			// Se realiza scroll para poder hacer click en el span de siguiente
 			await page.evaluate(async () => {
 				await new Promise<void>((resolve, reject) => {
@@ -163,7 +163,7 @@ class Scrapper {
 			});
 			await page.click('.pagination__arrow-right')
 		} catch (err) {
-			self.Common.Logger.Error(`[scraper.js].[ScrollAndClickNextpage] >> Error realizando scroll y click en paginación de países: ${err.message}`);
+			self.Common.Logger.Error(`[scraper.ts].[ScrollAndClickNextpage] >> Error realizando scroll y click en paginación de países: ${err.message}`);
 			throw new Error(err.message);
 		}
 	}
@@ -171,7 +171,7 @@ class Scrapper {
 	async InsertToDataBase(recordsToInsert:any) {
 		const self = this;
 		try {
-			self.Common.Logger.Debug(`[scraper.js].[InsertToDataBase] >> Inicia inserción a base de datos`);
+			self.Common.Logger.Debug(`[scraper.ts].[InsertToDataBase] >> Inicia inserción a base de datos`);
 			await utils.AsyncForeach(recordsToInsert, async (ciaRecord:any) => {
 				const spInsertParams = [
 					{
@@ -190,11 +190,11 @@ class Scrapper {
 						value: ciaRecord.country
 					}];
 				const insertionProcess = await self.Sql.ExecuteSP(self.Common.Config.StoredProcedures.Insertion, spInsertParams);
-				self.Common.Logger.Debug(`[scraper.js].[InsertToDataBase] >> Resultado de inserción: ${insertionProcess.recordest.Result}`);
+				self.Common.Logger.Debug(`[scraper.ts].[InsertToDataBase] >> Resultado de inserción: ${insertionProcess.recordest.Result}`);
 			})
 			return { success: true, result: 'OK', error: 'null' };
 		} catch (err) {
-			self.Common.Logger.Error(`[scraper.js].[InsertToDataBase] >> Error insertando en base de datos: ${err.message}`);
+			self.Common.Logger.Error(`[scraper.ts].[InsertToDataBase] >> Error insertando en base de datos: ${err.message}`);
 			return { success: false, result: 'null', error: err.message };
 		}
 	}

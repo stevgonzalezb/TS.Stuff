@@ -1,21 +1,21 @@
 import mssql from 'mssql';
 
 class MSSQL {
-    Common:any;
+    Common:Common;
 
-    constructor(Common:any){
+    constructor(Common:Common){
         this.Common = Common;
     }
 
-    async Connect (Config:any, cb:any) {
+    async Connect (DbConfig:any, cb:any) {
         const self = this;
-        self.Common.Logger.Debug('ConnectionManager.js >> Connect >> Conectando a Base de datos');
-        const pool = new mssql.ConnectionPool(Config, (err) => {
+        self.Common.Logger.Debug('[ConnectionManager.ts].[Connect] >> Connecting to Database');
+        const pool = new mssql.ConnectionPool(DbConfig, (err) => {
             if (err) {
-                self.Common.Logger.Error('ConnectionManager.js >> Connect >> Error conectando a BD >> ' + err);
+                self.Common.Logger.Error(`[ConnectionManager.ts].[Connect] >> Error trying to connect to Database >> ${err}`);
                 cb(err)
             } else {
-                self.Common.Logger.Debug('ConnectionManager.js >> Connect >> Conexión exitosa a BD');
+                self.Common.Logger.Debug('ConnectionManager.js >> Connect >> Succesfully connected to Database');
                 cb(null, pool);
             }
         });
@@ -23,10 +23,10 @@ class MSSQL {
 
     async ExecuteQuery(pool:any, query:string, cb:any) {
         const self = this;
-        self.Common.Logger.Debug('Conexión exitosa a BD desde query');
+        self.Common.Logger.Debug('[ConnectionManager.ts].[ExecuteQuery] >> Successful connection to DB from query');
         pool.request().query(query)
             .then((res:any)  => {
-                self.Common.Logger.Debug('Sentencia SQL exitosa', {
+                self.Common.Logger.Debug('[ConnectionManager.ts].[ExecuteQuery] >> Successful SQL statement', {
                     affected_Rows: res.rowsAffected[0],
                     Query: query
                 });
@@ -39,7 +39,7 @@ class MSSQL {
 
     ExecuteStoredProcedure(pool:any, spName:any, spParams:any, cb:any) {
         const self = this;
-        self.Common.Logger.Debug('ConnectionManager.js >> ExecuteSP >> Conexión exitosa a BD desde ejecución de SP' + spName);
+        self.Common.Logger.Debug(`[ConnectionManager.ts].[ExecuteStoredProcedure] >> Successful connection to DB from SP execution ${spName}`);
         const request = pool.request();
         // Se agregan los parámetros que requiere el SP para ejecutarse
         if (spParams.length > 0) {
@@ -50,10 +50,10 @@ class MSSQL {
         // Se ejecuta el SP
         request.execute(spName)
             .then((res:any) => {
-                self.Common.Logger.Debug('ConnectionManager.js >> ExecuteSP >> Ejecución de SP exitosa: ' + spName);
+                self.Common.Logger.Debug(`[ConnectionManager.ts].[ExecuteStoredProcedure] >> Successful SP execution: ${spName}`);
                 cb(null, res)
             }).catch((err:any) => {
-                cb('ConnectionManager.js >> ExecuteSP >> ' + err)
+                cb(`[ConnectionManager.ts].[ExecuteStoredProcedure] >> ${err}`)
             })
     };
 }

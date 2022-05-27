@@ -1,7 +1,7 @@
 import WinService from "./service";
 
 export = {
-    init(Common:any) {
+    init(Common:Common) {
         return new WinService(Common);
     }
 }

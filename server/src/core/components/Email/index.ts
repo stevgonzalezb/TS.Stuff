@@ -1,7 +1,7 @@
 import Email from './mail';
 
 export = {
-    init(Common:any){
+    init(Common:Common){
 		return new Email(Common);
 	}
 }

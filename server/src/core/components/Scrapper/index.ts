@@ -1,7 +1,7 @@
 import Scrapper from './scrapper'
 
 export = {
-    init(Common:any, Sql:any){
+    init(Common:Common, Sql:any){
 		return new Scrapper(Common, Sql);
 	}
 }

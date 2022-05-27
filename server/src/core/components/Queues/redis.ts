@@ -3,11 +3,11 @@ import Encoder from '../Encrypt'
 
 class RedisQueue {
 
-    Common:any;
+    Common:Common;
     QueueName:string;
     RedisClient:any;
 
-    constructor(Common:any, Name:string) {
+    constructor(Common:Common, Name:string) {
         this.Common = Common;
         this.QueueName = Name;
         this.CreateRedisClient();

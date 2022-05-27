@@ -1,6 +1,6 @@
 import Common from "./common";
 
-export ={
+export = {
 	init(){
 		return new Common();
 	}

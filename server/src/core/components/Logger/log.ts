@@ -1,10 +1,11 @@
-import winston from "winston";
+import winston, { format } from "winston";
 import  DailyRotateFile from 'winston-daily-rotate-file';
 import moment from 'moment';
 import fs from 'fs-extra';
 import fileControl from 'fs';
 import _ from 'lodash';
 import path from 'path';
+// import { LogLevels } from "src/core/global/enums";
 
 
 class Logger {
@@ -13,26 +14,37 @@ class Logger {
 	Logger: any;
 	CurrentLevel: any;
 
-	constructor(Config: any){
-		this.Transports = [];
+	constructor(Config: Config) {
+
+		this.Transports = [new winston.transports.Console()];
 		this.CurrentLevel = _.find(Config.Logs.LevelsMap, {name: Config.Logs.Level.toUpperCase()});
+		this.Logger = winston.createLogger({
+			format: format.combine(
+				format.colorize(),
+				format.timestamp(),
+				format.printf(({ timestamp, level, message, service }) => {
+				  return `[${timestamp}] ${level}: ${message}`;
+				})
+			)
+		});
 		this.Start(Config);
+
+
 	}
 
 
-	async Start(Config: any) {
+	async Start(Config: Config) {
 
 		const LOG_FOLDER = path.join(appRoot, 'Logs');
-		const transports = this.Transports;
-		// let DF = 'YYYY-MM-DD h:mm:ss a';
-		// Config.Logs.DateFormat !== "" ? DF = Config.Logs.DateFormat : null;
+		const objTransports = this.Transports;
+		const DF = 'YYYY-MM-DD h:mm:ss a';
 
 		if (appRoot !== undefined) {
 
 			try {
 				fs.ensureDir(LOG_FOLDER);
 
-				const transport: DailyRotateFile = new DailyRotateFile({
+				const transport = new DailyRotateFile({
 					filename: LOG_FOLDER + '\\' + Config.Logs.FileName.Name + '-%DATE%.log',
 					datePattern: Config.Logs.FileName.DatePattern,
 					zippedArchive: Config.Logs.ZippedLogFile,
@@ -41,7 +53,6 @@ class Logger {
 				  });
 
 				transport.on('rotate', (oldFileName, newFileName) => {
-					// this.logger.info('Archivo anterior ---> ' + oldFileName);
 					if (Config.Logs.Backup.RequireBackup) {
 						const src = oldFileName;
 						const fileNameToCopy = path.basename(src);
@@ -55,22 +66,23 @@ class Logger {
 					}
 				});
 
-				transports.push(transport);
-				this.Logger = winston.createLogger({
-					transports
+				objTransports.push(transport);
+
+				this.Logger.configure({
+					transports: objTransports,
+					level: 'debug'
 				});
 
-				this.Logger.info('Logger utilizando el transporte de archivos creado con éxito.');
+				this.Logger.info('[log.ts].[Start] >> Logger using the successfully created file transport.');
 
 			} catch (e) {
 				throw e;
 			}
 		}
 		else {
-			this.Logger.warn('No AppRoot defined in main class. Logger won\'t log to file.');
+			this.Logger.warn('[log.ts].[Start] >> No AppRoot defined in main class. Logger won\'t log to file.');
 		}
 	}
-
 
 	async copyFile(src:any, dest:any) {
 
@@ -83,25 +95,26 @@ class Logger {
 
 		readStream.once('end', () => {
 			// tslint:disable-next-line:no-console
-			console.log(' --> Archivo ' + src + ' respaldado');
+			console.log(' --> Files ' + src + ' Backup Done!');
 		});
 
 		readStream.pipe(fileControl.createWriteStream(dest));
 	}
 
 	async Debug (message:string) {
-		if (this.CurrentLevel.level === 2) {
+		if (this.CurrentLevel.level === LogLevels.DEBUG) {
 			this.Logger.log('debug', message);
 		}
 	};
+
 	async Info (message:string) {
-		if (this.CurrentLevel.level >= 1) {
+		if (this.CurrentLevel.level >= LogLevels.INFO) {
 			this.Logger.info(message);
 		}
 	};
 
 	async Error (message:string) {
-		if (this.CurrentLevel.level >= 0) {
+		if (this.CurrentLevel.level >= LogLevels.ERROR) {
 			this.Logger.error(message);
 		}
 	};

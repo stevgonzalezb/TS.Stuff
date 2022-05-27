@@ -6,11 +6,11 @@ global.appRoot = path.join(__dirname);
 
 export default class Server {
 
-    private Common:any;
+    private Common: Common;
     private WebApp: any;
     private Port: number;
 
-    constructor(Common: any) {
+    constructor(Common: Common) {
         this.Common = Common;
         this.WebApp = express();
         this.Port = Common.Config.WebServer.Port;
@@ -26,7 +26,7 @@ export default class Server {
                 res.send( "Web server is running!" );
             });
         } catch (error) {
-            self.Common.Logger.Error(`server.ts >> Routes() >> Error: ${error}`)
+            self.Common.Logger.Error(`server.ts >> Routes() >> Error: ${error}`);
         }
     }
 
@@ -37,8 +37,7 @@ export default class Server {
             this.WebApp.listen( this.Port, () => {
                 self.Common.Logger.Info(`Web Server Started Correctly at http://localhost:${ this.Port }`)
                 self.Common.Logger.Debug(`Web Server Started Correctly at http://localhost:${ this.Port }.`)
-            // tslint:disable-next-line:no-console
-            // console.log( `server started at http://localhost:${ this.port }` );
+                // tslint:disable-next-line:no-console
             });
         } catch (error) {
             self.Common.Logger.Error(`server.ts >> Start() >> Error: ${error}`)

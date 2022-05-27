@@ -5,10 +5,10 @@ import crypt from '../Encrypt';
 
 class Email {
 
-    Common: any;
+    Common: Common;
 	Transporter: any;
 
-	constructor(Common: any){
+	constructor(Common: Common){
 		this.Common = Common;
 		this.Transporter = '';
 	}
@@ -23,7 +23,7 @@ class Email {
         return new Promise((resolve, reject) => {
 
             if (self.Common.Config.SMTP.Password) {
-                const decryptedPassword = crypt.Decrypt('SMTP.Password', config.SMTP.Password);
+                const decryptedPassword = crypt.Decrypt('SMTP.Password', config.SMTPServer.Password);
                 if (decryptedPassword) {
                     const transporterConfig = {
                         host: self.Common.Config.SMTP.Dominio,

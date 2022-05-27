@@ -4,11 +4,11 @@ import path from 'path';
 
 class WinService {
 
-	Common:any;
+	Common:Common;
 	Options:any;
 	WinService:any;
 
-	constructor(Common:any){
+	constructor(Common:Common){
 
 		const Service =  require('node-windows').Service;
 		const EventLogger = require('node-windows').EventLogger;
@@ -33,7 +33,7 @@ class WinService {
 				self.WinService.start();
 			}
 			else {
-				self.Common.Logger.Info(self.Common.Format(self.Common.Messages.Success.SERVICE_CREATED, [self.Common.Config.Service.Name, self.WinService.exists]));
+				//self.Common.Logger.Info(self.Common.Format(self.Common.Messages.Success.SERVICE_CREATED, [self.Common.Config.Service.Name, self.WinService.exists]));
 			}
 		})
 	}
@@ -43,7 +43,7 @@ class WinService {
 		self.WinService.stop();
 		self.WinService.uninstall();
 		self.WinService.on('uninstall', () => {
-			self.Common.Logger.Info(self.Common.Format(self.Common.Messages.Success.SERVICE_REMOVED, [self.Common.Config.Service.Name, self.WinService.exists]));
+			//self.Common.Logger.Info(self.Common.Format(self.Common.Messages.Success.SERVICE_REMOVED, [self.Common.Config.Service.Name, self.WinService.exists]));
 		});
 	}
 }

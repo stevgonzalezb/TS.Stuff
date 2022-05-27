@@ -4,11 +4,11 @@ import fsExtra from 'fs-extra';
 import path from 'path';
 import jsObfuscator from 'javascript-obfuscator';
 
-class Ofuscador {
+class Obfuscator {
 
-	Common:any;
+	Common:Common;
 
-	constructor(Common:any) {
+	constructor(Common:Common) {
 		this.Common = Common;
 	}
 
@@ -17,13 +17,12 @@ class Ofuscador {
 		try {
 			const targetFolder = await this.CopySourceProject();
 			const obfuscatedFiles = await this.ReadFolderAndObfuscateFiles(targetFolder, []);
-			self.Common.Logger.Info(`[ofuscador.js].[Ofuscar] >> Archivos ofuscados:`);
+			self.Common.Logger.Info(`[jsObfuscator.ts].[Obfuscate] >> Obfuscated files:`);
+			obfuscatedFiles.forEach((element:any) => self.Common.Logger.Info(`[jsObfuscator.ts].[Obfuscate] >> ${element}`));
 			self.Common.Logger.Info(`************************************************`);
-			obfuscatedFiles.forEach((element:any) => self.Common.Logger.Info(`[ofuscador.js].[Ofuscar] >> ${element}`));
-			self.Common.Logger.Info(`************************************************`);
-			return self.Common.Logger.Info(`[ofuscador.js].[Ofuscar] >> Proyecto ofuscado de manera exitosa: ${targetFolder}`);
+			return self.Common.Logger.Info(`[jsObfuscator.ts].[Obfuscate] >> Project successfully obfuscated: ${targetFolder}`);
 		} catch (err) {
-			return self.Common.Logger.Error(`[ofuscador.js].[Ofuscar] >> Error ofuscando proyecto: ${err.message}`);
+			return self.Common.Logger.Error(`[jsObfuscator.ts].[Obfuscate] >> Error obfuscating project: ${err.message}`);
 		}
 	}
 
@@ -35,10 +34,10 @@ class Ofuscador {
 			const obfuscateFinalPath = `${self.Common.Config.ObfuscateProjectPath}\\${originalProjectName}_Ofuscado`;
 
 			fsExtra.copySync(originalProjectPath, `${obfuscateFinalPath}`);
-			self.Common.Logger.Info(`[ofuscador.js].[CopySourceProject] >> Proyecto copiado de manera exitosa: ${obfuscateFinalPath}`);
+			self.Common.Logger.Info(`[jsObfuscator.ts].[CopySourceProject] >> Project successfully copied: ${obfuscateFinalPath}`);
 			return obfuscateFinalPath;
 		} catch (err) {
-			throw new Error(`[ofuscador.js].[CopySourceProject] >> Error copiando proyecto original: ${err.message}`);
+			throw new Error(`[jsObfuscator.js].[CopySourceProject] >> Error copying original project: ${err.message}`);
 		}
 	}
 
@@ -59,14 +58,14 @@ class Ofuscador {
 							await this.ObfuscateFile(currentElementPath);
 							arrayOfFiles.push(currentElementPath);
 						} else {
-							self.Common.Logger.Info(`[ofuscador.js].[ReadFolderAndObfuscateFiles] >> Se omite la ofuscación del archivo "${currentElementPath}"`)
+							self.Common.Logger.Info(`[jsObfuscator.js].[ReadFolderAndObfuscateFiles] >> File obfuscation is omitted. "${currentElementPath}"`)
 						}
 					}
 				}
 			})
 			return arrayOfFiles
 		} catch (err) {
-			throw new Error(`[ofuscador.js].[ReadFolderAndObfuscateFiles] >> Error procesando proyecto: ${err.message}`);
+			throw new Error(`[jsObfuscator.js].[ReadFolderAndObfuscateFiles] >> Error processing project: ${err.message}`);
 		}
 	}
 
@@ -78,11 +77,11 @@ class Ofuscador {
 			const uglyCode = obfuscationResult.getObfuscatedCode();
 
 			fs.writeFileSync(filePath, uglyCode);
-			return self.Common.Logger.Debug(`[ofuscador.js].[ObfuscateFile] >> Archivo ${filePath} ofuscado de manera exitosa`);
+			return self.Common.Logger.Debug(`[jsObfuscator.js].[ObfuscateFile] >> File ${filePath} successfully obfuscated`);
 		} catch (err) {
-			throw new Error(`[ofuscador.js].[ObfuscateFile] >> Error ofuscando archivo ${filePath}: ${err.message}`);
+			throw new Error(`[ofuscador.js].[ObfuscateFile] >> File obfuscation error ${filePath}: ${err.message}`);
 		}
 	}
 }
 
-export = Ofuscador;
+export = Obfuscator;
